@@ -1,4 +1,4 @@
-baseURL = 'https://sds.idenstest.com'
+baseURL = 'sds-library.itsupport-e3e.workers.dev'
 languageCode = 'en-us'
 title = 'SDS Library'
 theme = "ananke"
