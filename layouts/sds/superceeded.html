@@ -1,0 +1,10 @@
+<h1>Superseded SDS Files</h1>
+
+{{ $superseded := where site.Pages "File.Dir" "matches" "content/sds/superseded" }}
+{{ $sorted := sort $superseded "Params.manufacturer" }}
+
+<ul>
+{{ range $sorted }}
+  <li><strong>{{ .Params.manufacturer }}</strong> – <a href="{{ .Params.pdf }}">{{ .Title }}</a></li>
+{{ end }}
+</ul>

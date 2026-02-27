@@ -1,0 +1,5 @@
+baseURL = 'https://sds.idenstest.com'
+languageCode = 'en-us'
+title = 'SDS Library'
+theme = "ananke"
+paginate = 0

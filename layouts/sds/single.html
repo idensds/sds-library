@@ -1,0 +1,60 @@
+{{ define "main" }}
+
+<style>
+body {
+    padding: 20px;
+    font-family: sans-serif;
+}
+
+.sds-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.sds-actions {
+    margin-top: 20px;
+}
+
+#qrcode {
+    margin-top: 20px;
+}
+</style>
+
+<div class="sds-container">
+
+    <h1>{{ .Title }}</h1>
+
+    <p><strong>Manufacturer:</strong> {{ .Params.manufacturer }}</p>
+
+    <!-- Embedded PDF -->
+    <div class="sds-actions">
+        <iframe src="{{ .Params.pdf }}" 
+                style="width:100%; height:800px; border:1px solid #ccc;">
+        </iframe>
+        <p><a href="{{ .Params.pdf }}" target="_blank">View PDF in new tab</a></p>
+    </div>
+
+    <!-- QR Code -->
+    <div class="sds-actions">
+        <button id="generate-qr">Generate QR Code</button>
+        <div id="qrcode"></div>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+document.getElementById("generate-qr").addEventListener("click", function() {
+    const container = document.getElementById("qrcode");
+    container.innerHTML = "";
+
+    new QRCode(container, {
+        text: "{{ .Params.pdf | absURL }}",
+        width: 200,
+        height: 200
+    });
+});
+</script>
+
+{{ end }}

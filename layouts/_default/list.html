@@ -1,0 +1,7 @@
+<h1>SDS Library</h1>
+
+<ul>
+{{ range sort .Pages "Params.manufacturer" }}
+  <li><strong>{{ .Params.manufacturer }}</strong> – <a href="{{ .Params.pdf }}">{{ .Title }}</a></li>
+{{ end }}
+</ul>
