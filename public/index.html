@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     
@@ -82,7 +82,7 @@ body {
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 20px;
 }
 
@@ -196,6 +196,15 @@ body {
     border-radius: 4px;
 }
 
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+@media (max-width: 640px) {
+    .header-actions { flex-direction: column; width: 100%; }
+}
+
  
 .sds-sections {
     max-width: 1200px;
@@ -230,6 +239,144 @@ body {
 .manufacturer-group ul {
     padding-left: 20px;
 }
+
+ 
+@media (max-width: 640px) {
+   
+  .header-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "left right"
+      "center center";
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .header-left {
+    grid-area: left;
+    padding-left: 0;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .header-left img {
+    height: 44px;
+    margin-right: 10px;
+  }
+
+  .header-left h1 {
+    font-size: 1.2rem;
+    white-space: normal;
+    line-height: 1.15;
+  }
+
+  .header-right {
+    grid-area: right;
+    padding-right: 0;
+    justify-self: end;
+    align-self: center;
+  }
+
+  .header-center {
+    grid-area: center;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  #sds-search {
+    width: 100%;
+    font-size: 16px;  
+    padding: 12px;
+  }
+
+  #back-to-top {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .sds-sections {
+    padding: 0 12px;
+  }
+
+  .manufacturer-group,
+  .manufacturer-group h3,
+  .manufacturer-group ul,
+  .manufacturer-group li {
+    padding-left: 16px;
+  }
+
+  .qr-modal-content {
+    width: min(320px, 92vw);
+    margin: 80px auto;
+    padding: 20px;
+  }
+}
+
+
+
+ 
+.manufacturer-toggle {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 8px 0;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.manufacturer-toggle:focus {
+  outline: 2px solid rgba(0,0,0,0.3);
+  outline-offset: 2px;
+}
+
+.manufacturer-group.collapsed ul {
+  display: none;
+}
+
+.manufacturer-toggle::before {
+  content: "▼";
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.manufacturer-group.collapsed .manufacturer-toggle::before {
+  content: "▶";
+}
+
+ 
+@media (max-width: 640px) {
+  .manufacturer-toggle {
+    padding: 12px 0;
+  }
+}
+
+
+ 
+#toggle-all {
+  padding: 8px 12px;
+  border: 1px solid #333;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  border-radius: 4px;
+}
+@media (max-width: 640px) {
+  #toggle-all { width: 100%; }
+}
 </style>
 
 <div class="header-container">
@@ -246,7 +393,10 @@ body {
         <input type="checkbox" id="toggle-superseded">
         Superseded/Archived
       </label>
-      <button id="back-to-top">Go to Top ↑</button>
+      <div class="header-actions">
+          <button id="toggle-all" type="button">Collapse</button>
+          <button id="back-to-top" type="button">Go to Top ↑</button>
+        </div>
     </div>
 
     <div class="header-right">
@@ -6004,9 +6154,88 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const input = document.getElementById("sds-search");
   const groups = document.querySelectorAll(".manufacturer-group");
+
+
+ 
+
+groups.forEach((group) => {
+  const h3 = group.querySelector("h3");
+  const ul = group.querySelector("ul");
+  if (!h3 || !ul) return;
+
+  
+  if (group.querySelector(".manufacturer-toggle")) return;
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "manufacturer-toggle";
+  btn.setAttribute("aria-expanded", "true");
+  btn.textContent = h3.textContent;
+
+  h3.replaceWith(btn);
+
+  btn.addEventListener("click", () => {
+    const isCollapsed = group.classList.toggle("collapsed");
+    btn.setAttribute("aria-expanded", (!isCollapsed).toString());
+  });
+});
+
+
+if (window.matchMedia("(max-width: 640px)").matches) {
+  groups.forEach((group) => {
+    const btn = group.querySelector(".manufacturer-toggle");
+    const ul = group.querySelector("ul");
+    if (!btn || !ul) return;
+    group.classList.add("collapsed");
+    btn.setAttribute("aria-expanded", "false");
+  });
+}
+
+
+
+groups.forEach((group) => {
+  group.dataset.initialCollapsed = group.classList.contains("collapsed") ? "1" : "0";
+});
   const toggle = document.getElementById("toggle-superseded");
   const body = document.body;
   const backBtn = document.getElementById("back-to-top");
+
+const toggleAllBtn = document.getElementById("toggle-all");
+function setAllCollapsed(collapsed) {
+  groups.forEach((group) => {
+    const btn = group.querySelector(".manufacturer-toggle");
+    const ul = group.querySelector("ul");
+    if (!btn || !ul) return;
+    group.classList.toggle("collapsed", collapsed);
+    btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+  });
+}
+
+function areAnyExpanded() {
+  
+  return Array.from(groups).some(g => !g.classList.contains("collapsed"));
+}
+
+function syncToggleAllLabel() {
+  if (!toggleAllBtn) return;
+  
+  toggleAllBtn.textContent = areAnyExpanded() ? "Collapse Categories" : "Expand Categories";
+}
+
+if (toggleAllBtn) {
+  toggleAllBtn.addEventListener("click", function () {
+    const anyExpanded = areAnyExpanded();
+    
+    setAllCollapsed(anyExpanded);
+    
+    groups.forEach((group) => {
+      group.dataset.initialCollapsed = group.classList.contains("collapsed") ? "1" : "0";
+    });
+
+    syncToggleAllLabel();
+    syncToggleAllLabel();
+  });
+}
 
   const modal = document.getElementById("qr-modal");
   const openQR = document.getElementById("qr-open");
@@ -6019,7 +6248,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const downloadBtn = document.getElementById("download-qr");
   const printBtn = document.getElementById("print-qr");
 
-  const url = "https://sds.idensonline.com";
+  const url = "https://sds.idensdealerservices.com";
 
    
   backBtn.addEventListener("click", function() {
@@ -6034,6 +6263,7 @@ document.addEventListener("DOMContentLoaded", function () {
    
   input.addEventListener("input", function () {
     const filter = input.value.toLowerCase();
+    const isSearching = filter.length > 0;
 
     groups.forEach(function (group) {
       let visibleCount = 0;
@@ -6051,6 +6281,23 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
 
+
+
+
+
+const toggleBtn = group.querySelector(".manufacturer-toggle");
+if (toggleBtn) {
+  if (isSearching) {
+    if (visibleCount > 0) {
+      group.classList.remove("collapsed");
+      toggleBtn.setAttribute("aria-expanded", "true");
+    }
+  } else {
+    const shouldBeCollapsed = group.dataset.initialCollapsed === "1";
+    group.classList.toggle("collapsed", shouldBeCollapsed);
+    toggleBtn.setAttribute("aria-expanded", shouldBeCollapsed ? "false" : "true");
+  }
+}
       group.style.display = visibleCount > 0 ? "" : "none";
     });
   });
