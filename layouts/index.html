@@ -1,0 +1,371 @@
+{{ define "main" }}
+
+<style>
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+
+/* Sticky header full width */
+.header-container {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background: #ffffff;
+    z-index: 1000;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header inner flex */
+.header-inner {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+/* Left group flush left */
+.header-left {
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    flex: 0 0 auto;
+}
+
+.header-left img {
+    height: 60px;
+    margin-right: 15px;
+}
+
+.header-left h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    white-space: nowrap;
+}
+
+/* Center group */
+.header-center {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Right side */
+.header-right {
+    flex: 0 0 auto;
+    padding-right: 20px;
+}
+
+/* QR icon button */
+.qr-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+}
+
+#qr-mini {
+    width: 32px;
+    height: 32px;
+}
+
+#qr-mini canvas,
+#qr-mini img {
+    width: 32px !important;
+    height: 32px !important;
+}
+
+/* QR Modal */
+#qr-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+}
+
+.qr-modal-content {
+    background: white;
+    padding: 30px;
+    margin: 100px auto;
+    width: 320px;
+    text-align: center;
+    border-radius: 8px;
+    position: relative;
+}
+
+#qr-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+#qr-buttons {
+    margin-top: 15px;
+    display: none;
+}
+
+#qr-buttons button {
+    margin: 5px;
+    padding: 8px 12px;
+}
+
+#sds-search {
+    padding: 8px;
+    width: 250px;
+    box-sizing: border-box;
+}
+
+#back-to-top {
+    padding: 8px 12px;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Sections container */
+.sds-sections {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.current-section { order: 1; }
+.superseded-section { order: 2; }
+
+.superseded-mode .current-section { display: none; }
+.superseded-mode .superseded-section { order: 0; }
+
+/* Force lists left aligned */
+.sds-sections,
+.manufacturer-group,
+.manufacturer-group h3,
+.manufacturer-group ul,
+.manufacturer-group li {
+    text-align: left !important;
+    margin-left: 0 !important;
+    padding-left: 20px;
+}
+
+.manufacturer-group h3 {
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+.manufacturer-group ul {
+    padding-left: 20px;
+}
+</style>
+
+<div class="header-container">
+  <div class="header-inner">
+
+    <div class="header-left">
+      <img src="/images/logo.png" alt="Company Logo">
+      <h1>Iden's SDS Library</h1>
+    </div>
+
+    <div class="header-center">
+      <input type="text" id="sds-search" placeholder="Search...">
+      <label>
+        <input type="checkbox" id="toggle-superseded">
+        Superseded/Archived
+      </label>
+      <button id="back-to-top">Go to Top ↑</button>
+    </div>
+
+    <div class="header-right">
+      <button id="qr-open" class="qr-icon-btn">
+        <div id="qr-mini"></div>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- QR Modal -->
+<div id="qr-modal">
+  <div class="qr-modal-content">
+    <span id="qr-close">✕</span>
+    <h3>SDS Library QR</h3>
+    <div id="qrcode" style="margin-top:15px;"></div>
+    <div id="qr-buttons">
+      <button id="download-qr">Download QR</button>
+      <button id="print-qr">Print QR</button>
+    </div>
+  </div>
+</div>
+
+{{ $pages := where .Site.RegularPages "Section" "sds" }}
+{{ $grouped := $pages.GroupByParam "manufacturer" }}
+
+<div class="sds-sections">
+
+<div class="current-section">
+<h2>Current SDS Sheets</h2>
+
+{{ range $grouped }}
+  {{ $active := where .Pages "Params.superseded" "ne" true }}
+  {{ if gt (len $active) 0 }}
+  <div class="manufacturer-group">
+    <h3>{{ .Key }}</h3>
+    <ul>
+      {{ range $active.ByTitle }}
+        <li class="sds-item"
+            data-title="{{ .Title | lower }}"
+            data-manufacturer="{{ .Params.manufacturer | lower }}">
+          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        </li>
+      {{ end }}
+    </ul>
+  </div>
+  {{ end }}
+{{ end }}
+</div>
+
+<div class="superseded-section">
+<hr style="margin:40px 0;">
+<h2>Superseded SDS Sheets (Archived)</h2>
+
+{{ range $grouped }}
+  {{ $old := where .Pages "Params.superseded" "eq" true }}
+  {{ if gt (len $old) 0 }}
+  <div class="manufacturer-group">
+    <h3>{{ .Key }}</h3>
+    <ul>
+      {{ range $old.ByTitle }}
+        <li class="sds-item"
+            data-title="{{ .Title | lower }}"
+            data-manufacturer="{{ .Params.manufacturer | lower }}">
+          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        </li>
+      {{ end }}
+    </ul>
+  </div>
+  {{ end }}
+{{ end }}
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const input = document.getElementById("sds-search");
+  const groups = document.querySelectorAll(".manufacturer-group");
+  const toggle = document.getElementById("toggle-superseded");
+  const body = document.body;
+  const backBtn = document.getElementById("back-to-top");
+
+  const modal = document.getElementById("qr-modal");
+  const openQR = document.getElementById("qr-open");
+  const closeQR = document.getElementById("qr-close");
+
+  const qrContainer = document.getElementById("qrcode");
+  const qrButtons = document.getElementById("qr-buttons");
+  const qrMini = document.getElementById("qr-mini");
+
+  const downloadBtn = document.getElementById("download-qr");
+  const printBtn = document.getElementById("print-qr");
+
+  const url = "https://sds.idensonline.com";
+
+  /* Back to top */
+  backBtn.addEventListener("click", function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  /* Superseded toggle */
+  toggle.addEventListener("change", function () {
+    body.classList.toggle("superseded-mode", toggle.checked);
+  });
+
+  /* Search filter */
+  input.addEventListener("input", function () {
+    const filter = input.value.toLowerCase();
+
+    groups.forEach(function (group) {
+      let visibleCount = 0;
+      const items = group.querySelectorAll(".sds-item");
+
+      items.forEach(function (item) {
+        const title = item.dataset.title;
+        const manufacturer = item.dataset.manufacturer;
+
+        if (title.includes(filter) || manufacturer.includes(filter)) {
+          item.style.display = "";
+          visibleCount++;
+        } else {
+          item.style.display = "none";
+        }
+      });
+
+      group.style.display = visibleCount > 0 ? "" : "none";
+    });
+  });
+
+  /* Mini QR in header */
+  new QRCode(qrMini, {
+    text: url,
+    width: 32,
+    height: 32
+  });
+
+  /* Open modal + autogenerate QR */
+  openQR.onclick = () => {
+    modal.style.display = "block";
+
+    if(qrContainer.innerHTML === "") {
+      new QRCode(qrContainer, {
+        text: url,
+        width: 220,
+        height: 220
+      });
+      qrButtons.style.display = "block";
+    }
+  };
+
+  closeQR.onclick = () => modal.style.display = "none";
+  window.onclick = e => { if(e.target == modal) modal.style.display = "none"; };
+
+  /* Download QR */
+  downloadBtn.onclick = function() {
+    const img = qrContainer.querySelector("img");
+    const link = document.createElement("a");
+    link.href = img.src;
+    link.download = "sds-library-qr.png";
+    link.click();
+  };
+
+  /* Print QR */
+  printBtn.onclick = function() {
+    const img = qrContainer.querySelector("img").src;
+    const w = window.open("");
+    w.document.write("<img src='"+img+"' style='width:300px;'>");
+    w.print();
+    w.close();
+  };
+
+});
+</script>
+
+{{ end }}
