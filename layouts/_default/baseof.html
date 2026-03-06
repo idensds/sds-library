@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>{{ if .Title }}{{ .Title }} | {{ end }}{{ .Site.Title }}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="">
+    <link rel="stylesheet" href="/ananke/css/main.min.css">
+  </head>
+  <body class="ma0 avenir bg-near-white">
+    <main class="pb7" role="main">
+      {{ block "main" . }}{{ end }}
+    </main>
+  </body>
+</html>

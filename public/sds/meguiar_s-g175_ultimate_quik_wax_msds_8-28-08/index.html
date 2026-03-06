@@ -1,56 +1,14 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    
     <title>G175 Ultimate Quik Wax MSDS 8-28-08.pdf | SDS Library</title>
-    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="">
-    <meta name="generator" content="Hugo 0.156.0">
-    
-    
-    
-      <meta name="robots" content="noindex, nofollow">
-    
-    
-
-    
-<link rel="stylesheet" href="/ananke/css/main.min.css" >
-
-
-
-
-    
-
-
-    
-      
-
-    
-
-    
-
-    
-      <link rel="canonical" href="http://localhost:1313/sds/meguiar_s-g175_ultimate_quik_wax_msds_8-28-08/">
-    
-
-    
-    
-    <meta property="og:url" content="http://localhost:1313/sds/meguiar_s-g175_ultimate_quik_wax_msds_8-28-08/">
-  <meta property="og:site_name" content="SDS Library">
-  <meta property="og:title" content="G175 Ultimate Quik Wax MSDS 8-28-08.pdf">
-  <meta property="og:locale" content="en_us">
-  <meta property="og:type" content="article">
-    <meta property="article:section" content="sds">
-
-  <meta itemprop="name" content="G175 Ultimate Quik Wax MSDS 8-28-08.pdf">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="G175 Ultimate Quik Wax MSDS 8-28-08.pdf">
-
-	
-  </head><body class="ma0 avenir bg-near-white development is-page is-page page-Meguiar_s-G175_Ultimate_Quik_Wax_MSDS_8-28-08">
-    
+    <link rel="stylesheet" href="/ananke/css/main.min.css">
+  </head>
+  <body class="ma0 avenir bg-near-white">
     <main class="pb7" role="main">
       
 
@@ -147,6 +105,7 @@ const generateBtn = document.getElementById("generate-qr");
 const downloadBtn = document.getElementById("download-qr");
 const printBtn = document.getElementById("print-qr");
 
+const PASSWORD = "sdsaccess";
 
 generateBtn.addEventListener("click", function() {
 
@@ -158,12 +117,10 @@ generateBtn.addEventListener("click", function() {
         height: 200
     });
 
-     
     downloadBtn.classList.remove("hidden");
     printBtn.classList.remove("hidden");
 
 });
-
 
  
 downloadBtn.addEventListener("click", function() {
@@ -176,7 +133,6 @@ downloadBtn.addEventListener("click", function() {
     link.click();
 
 });
-
 
  
 printBtn.addEventListener("click", function(){
@@ -196,15 +152,27 @@ printBtn.addEventListener("click", function(){
             padding:40px;
         }
         img {
-            width:300px;
+            width:320px;
+        }
+        h1 {
+            margin-bottom:20px;
+        }
+        .subhead {
+            font-size:18px;
+            margin-top:20px;
+        }
+        .password {
+            font-size:18px;
         }
         </style>
         </head>
         <body>
 
-        <h2>G175 Ultimate Quik Wax MSDS 8-28-08.pdf</h2>
+        <h1>G175 Ultimate Quik Wax MSDS 8-28-08.pdf</h1>
         <img src="${img.src}" />
-        <p>Scan for SDS</p>
+
+        <p class="subhead">Scan for SDS</p>
+        <p class="password">Password: ${PASSWORD}</p>
 
         \x3Cscript>
         window.onload = function(){
@@ -224,15 +192,5 @@ printBtn.addEventListener("click", function(){
 
 
     </main>
-    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
-  <div class="flex justify-between">
-  <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
-    &copy;  SDS Library 2026 
-  </a>
-    <div><div class="ananke-socials"></div>
-</div>
-  </div>
-</footer>
-
   </body>
 </html>
