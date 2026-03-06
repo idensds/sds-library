@@ -151,12 +151,14 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
 }
 
 .qr-modal-content {
     background: white;
     padding: 30px;
-    margin: 100px auto;
+    margin: 0;
     width: 320px;
     text-align: center;
     border-radius: 8px;
@@ -374,6 +376,18 @@ body {
   cursor: pointer;
   border-radius: 4px;
 }
+
+.toggle-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#toggle-icon {
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
 @media (max-width: 640px) {
   #toggle-all { width: 100%; }
 }
@@ -394,7 +408,7 @@ body {
         Superseded/Archived
       </label>
       <div class="header-actions">
-          <button id="toggle-all" type="button">Collapse</button>
+          <button id="toggle-all" type="button" class="toggle-all-btn"><span id="toggle-icon">▼</span> Collapse Categories</button>
           <button id="back-to-top" type="button">Go to Top ↑</button>
         </div>
     </div>
@@ -413,7 +427,7 @@ body {
   <div class="qr-modal-content">
     <span id="qr-close">✕</span>
     <h3>SDS Library QR</h3>
-    <div id="qrcode" style="margin-top:15px;"></div>
+    <div id="qrcode" style="margin-top:15px; display:flex; justify-content:center;"></div>
     <div id="qr-buttons">
       <button id="download-qr">Download QR</button>
       <button id="print-qr">Print QR</button>
@@ -6201,41 +6215,45 @@ groups.forEach((group) => {
   const backBtn = document.getElementById("back-to-top");
 
 const toggleAllBtn = document.getElementById("toggle-all");
-function setAllCollapsed(collapsed) {
-  groups.forEach((group) => {
-    const btn = group.querySelector(".manufacturer-toggle");
-    const ul = group.querySelector("ul");
-    if (!btn || !ul) return;
-    group.classList.toggle("collapsed", collapsed);
-    btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
-  });
-}
 
-function areAnyExpanded() {
-  // If any group is NOT collapsed, then consider "some expanded"
-  return Array.from(groups).some(g => !g.classList.contains("collapsed"));
-}
+    function setAllCollapsed(collapsed) {
+      groups.forEach((group) => {
+        const btn = group.querySelector(".manufacturer-toggle");
+        const ul = group.querySelector("ul");
+        if (!btn || !ul) return;
+        group.classList.toggle("collapsed", collapsed);
+        btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      });
+    }
 
-function syncToggleAllLabel() {
-  if (!toggleAllBtn) return;
-  // If anything expanded, offer "Collapse all"; else offer "Expand all"
-  toggleAllBtn.textContent = areAnyExpanded() ? "Collapse Categories" : "Expand Categories";
-}
+    function areAnyExpanded() {
+      return Array.from(groups).some(g => !g.classList.contains("collapsed"));
+    }
 
-if (toggleAllBtn) {
-  toggleAllBtn.addEventListener("click", function () {
-    const anyExpanded = areAnyExpanded();
-    // If any expanded -> collapse all. If none expanded -> expand all.
-    setAllCollapsed(anyExpanded);
-    // Update the remembered initial state so clearing search restores to the user’s latest preference
-    groups.forEach((group) => {
-      group.dataset.initialCollapsed = group.classList.contains("collapsed") ? "1" : "0";
-    });
+    function syncToggleAllLabel() {
+      if (!toggleAllBtn) return;
 
-    syncToggleAllLabel();
-    syncToggleAllLabel();
-  });
-}
+      const anyExpanded = areAnyExpanded();
+
+      if (anyExpanded) {
+        toggleAllBtn.innerHTML = '<span id="toggle-icon">▼</span> Collapse Categories';
+      } else {
+        toggleAllBtn.innerHTML = '<span id="toggle-icon">▶</span> Expand Categories';
+      }
+    }
+
+    if (toggleAllBtn) {
+      toggleAllBtn.addEventListener("click", function () {
+        const anyExpanded = areAnyExpanded();
+        setAllCollapsed(anyExpanded);
+
+        groups.forEach((group) => {
+          group.dataset.initialCollapsed = group.classList.contains("collapsed") ? "1" : "0";
+        });
+
+        syncToggleAllLabel();
+      });
+    }
 
   const modal = document.getElementById("qr-modal");
   const openQR = document.getElementById("qr-open");
@@ -6303,6 +6321,52 @@ if (toggleBtn) {
   });
 
    
+
+  const QR_PASSWORD = "sdsaccess";
+
+  function getQrPrintHtml(title, imgSrc) {
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <title>${title}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 32px 20px;
+    }
+    h1 {
+      margin: 0 0 18px;
+      font-size: 28px;
+    }
+    .subhead {
+      margin: 18px 0 6px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .password {
+      margin: 0;
+      font-size: 18px;
+    }
+    img {
+      width: 320px;
+      max-width: 90vw;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>${title}</h1>
+  <img src="${imgSrc}" alt="QR Code">
+  <p class="subhead">Scan for SDS</p>
+  <p class="password">Password: ${QR_PASSWORD}</p>
+</body>
+</html>`;
+  }
+
   new QRCode(qrMini, {
     text: url,
     width: 32,
@@ -6311,7 +6375,7 @@ if (toggleBtn) {
 
    
   openQR.onclick = () => {
-    modal.style.display = "block";
+    modal.style.display = "flex";
 
     if(qrContainer.innerHTML === "") {
       new QRCode(qrContainer, {
@@ -6338,10 +6402,11 @@ if (toggleBtn) {
    
   printBtn.onclick = function() {
     const img = qrContainer.querySelector("img").src;
-    const w = window.open("");
-    w.document.write("<img src='"+img+"' style='width:300px;'>");
+    const w = window.open("", "_blank");
+    w.document.write(getQrPrintHtml("SDS Library", img));
+    w.document.close();
+    w.focus();
     w.print();
-    w.close();
   };
 
 });
@@ -6349,15 +6414,7 @@ if (toggleBtn) {
 
 
     </main>
-    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
-  <div class="flex justify-between">
-  <a class="f4 fw4 hover-white white-70 dn dib-ns pv2 ph3 no-underline" href="http://localhost:1313/" >
-    &copy;  SDS Library 2026 
-  </a>
-    <div><div class="ananke-socials"></div>
-</div>
-  </div>
-</footer>
+    
 
   </body>
 </html>

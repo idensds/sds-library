@@ -93,6 +93,7 @@ const generateBtn = document.getElementById("generate-qr");
 const downloadBtn = document.getElementById("download-qr");
 const printBtn = document.getElementById("print-qr");
 
+const PASSWORD = "sdsaccess";
 
 generateBtn.addEventListener("click", function() {
 
@@ -104,12 +105,10 @@ generateBtn.addEventListener("click", function() {
         height: 200
     });
 
-    /* Reveal buttons after generation */
     downloadBtn.classList.remove("hidden");
     printBtn.classList.remove("hidden");
 
 });
-
 
 /* Download QR */
 downloadBtn.addEventListener("click", function() {
@@ -122,7 +121,6 @@ downloadBtn.addEventListener("click", function() {
     link.click();
 
 });
-
 
 /* Print QR */
 printBtn.addEventListener("click", function(){
@@ -142,15 +140,27 @@ printBtn.addEventListener("click", function(){
             padding:40px;
         }
         img {
-            width:300px;
+            width:320px;
+        }
+        h1 {
+            margin-bottom:20px;
+        }
+        .subhead {
+            font-size:18px;
+            margin-top:20px;
+        }
+        .password {
+            font-size:18px;
         }
         </style>
         </head>
         <body>
 
-        <h2>{{ .Title }}</h2>
+        <h1>{{ .Title }}</h1>
         <img src="${img.src}" />
-        <p>Scan for SDS</p>
+
+        <p class="subhead">Scan for SDS</p>
+        <p class="password">Password: ${PASSWORD}</p>
 
         <script>
         window.onload = function(){
